@@ -11,7 +11,7 @@ namespace Stormies.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("Game");
         }
 
         public ActionResult Game()

@@ -8,6 +8,7 @@
     <ul id="players"></ul>
 </div>
 
+<div id="game-area"></div>
 
 @section scripts {
     <script src="../../Scripts/jquery.signalR-2.2.0.min.js"></script>
@@ -16,60 +17,98 @@
 
     <script type="text/javascript">
 
+    $(function () {
+
         window.onload = function () {
-            var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create });
+
+            var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
             function preload() {
-                game.load.image('logo', '../../Images/phaser.png');
+
+                game.load.tilemap('stormies', '../../Map/StormiesMap.json', null, Phaser.Tilemap.TILED_JSON);
+                game.load.image('tiles', '../../Tiles/stormies.png');
+
             }
+
+            var map;
+            var layer;
+            var cursors;
 
             function create() {
-                var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-                logo.anchor.setTo(0.5, 0.5);
+
+                game.stage.backgroundColor = '#787878';
+                map = game.add.tilemap('stormies');
+                map.addTilesetImage('StormiesTiles', 'tiles');
+                layer = map.createLayer('World1');
+                layer.resizeWorld();
+                layer.wrap = true;
+
+                cursors = game.input.keyboard.createCursorKeys();
+
             }
+
+            function update() {
+
+                if (cursors.left.isDown) {
+                    game.camera.x -= 8;
+                }
+                else if (cursors.right.isDown) {
+                    game.camera.x += 8;
+                }
+
+                if (cursors.up.isDown) {
+                    game.camera.y -= 8;
+                }
+                else if (cursors.down.isDown) {
+                    game.camera.y += 8;
+                }
+
+            }
+        }
+
+        var game = $.connection.chatHub;
+
+        game.client.updateGameState = function (gameState) {
+            $('#players').empty();
+            $('#yourName').empty();
+            $('#yourName').append(htmlEncode("Stormies!!!"));
+            for (var playerIp in gameState.Players) {
+                if (playerIp === '@Request.UserHostAddress') {
+                    $('#yourName').append(htmlEncode(" Hello " + gameState.Players[playerIp].Name) +
+                        " Health: " + gameState.Players[playerIp].Health);
+                }
+                $('#players').append('<li>' + htmlEncode(gameState.Players[playerIp].Name) + " " + htmlEncode(playerIp) + '</li>');
+            };
+
         };
 
-    </script>
+        game.client.passErrorMessage = function (message) {
+            alert(message);
+        };
 
-    <script>
-        $(function () {
+        $('#message').focus();
 
-            var game = $.connection.chatHub;
-
-            game.client.updateGameState = function (gameState) {
-                $('#players').empty();
-                $('#yourName').empty();
-                $('#yourName').append(htmlEncode("Stormies!!!"));
-                gameState.Players.forEach(function (player) {
-                    if (player.Ip === '@Request.UserHostAddress') {
-                        $('#yourName').append(htmlEncode(" Hello " + player.Name));
-                    }
-                    $('#players').append('<li>' + htmlEncode(player.Name) + " " + htmlEncode(player.Ip) + '</li>');
-                });
-            };
-
-            game.client.passErrorMessage = function (message) {
-                alert(message);
-            };
-
-            $('#message').focus();
-
-            $.connection.hub.start().done(function () {
-                $('#joinGame').click(function () {
-                    game.server.joinRequest($('#playerName').val(), '@Request.UserHostAddress');
-                });
-                $(document).ready(function () {
-                    game.server.getGameState();
-                });
-                $(window).bind('beforeunload', function () {
-                    game.server.leaveRequest('@Request.UserHostAddress');
-                });
+        $.connection.hub.start().done(function () {
+            $('#joinGame').click(function () {
+                game.server.joinRequest($('#playerName').val(), '@Request.UserHostAddress');
+            });
+            $(document).ready(function () {
+                game.server.getGameState();
+            });
+            $(window).bind('beforeunload', function () {
+                game.server.leaveRequest('@Request.UserHostAddress');
+            });
+            $(document).keypress(function (e) {
+                if (e.which === 49) {
+                    game.server.firstSkillUsed('@Request.UserHostAddress');
+                }
             });
         });
+    });
 
-        function htmlEncode(value) {
-            var encodedValue = $('<div />').text(value).html();
-            return encodedValue;
-        }
+    function htmlEncode(value) {
+        var encodedValue = $('<div />').text(value).html();
+        return encodedValue;
+    }
     </script>
 }

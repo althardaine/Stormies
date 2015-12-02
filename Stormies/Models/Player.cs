@@ -6,16 +6,19 @@ namespace Stormies.Models
     {
 
         public string Name { get; private set; }
-        public string Ip { get; private set; }
         public Point Position { get; private set; }
         public int Health { get; private set; }
 
-        public Player(string name, string ip)
+        public Player(string name)
         {
             Name = name;
-            Ip = ip;
             Position = new Point(10, 10);
             Health = 100;
+        }
+
+        public void TakeDamage(int damage)
+        {
+            Health -= 10;
         }
 
     }
