@@ -1,5 +1,56 @@
 ﻿@{
     ViewBag.Title = "Game";
 }
-
 <h2>Game</h2>
+<h2 id="yourName"></h2>
+<div class="container">
+    <input type="text" id="playerName" />
+    <input type="button" id="joinGame" value="Join" />
+    <ul id="players"></ul>
+</div>
+
+
+@section scripts {
+    <script src="../../Scripts/jquery.signalR-2.2.0.min.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script>
+    $(function () {
+
+        var game = $.connection.chatHub;
+
+        game.client.updateGameState = function (gameState) {
+            $('#players').empty();
+            $('#yourName').empty();
+            gameState.Players.forEach(function (player) {
+                if (player.Ip === '@Request.UserHostAddress') {
+                    $('#yourName').append(htmlEncode("Hello " + player.Name));
+                }
+                $('#players').append('<li>' + htmlEncode(player.Name) + " " + htmlEncode(player.Ip) + '</li>');
+            });
+        };
+
+        game.client.passErrorMessage = function (message) {
+            alert(message);
+        };
+
+        $('#message').focus();
+
+        $.connection.hub.start().done(function () {
+            $('#joinGame').click(function () {
+                game.server.joinRequest($('#playerName').val(), '@Request.UserHostAddress');
+            });
+            $(document).ready(function () {
+                game.server.getGameState();
+            });
+            $(window).bind('beforeunload', function () {
+                game.server.leaveRequest('@Request.UserHostAddress');
+            });
+        });
+    });
+
+    function htmlEncode(value) {
+        var encodedValue = $('<div />').text(value).html();
+        return encodedValue;
+    }
+    </script>
+}
