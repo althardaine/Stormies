@@ -84,10 +84,6 @@
                 gameArea.load.tilemap('stormies', '../../Map/StormiesMap.json', null, Phaser.Tilemap.TILED_JSON);
                 gameArea.load.image('tiles', '../../Tiles/stormies.png');
                 gameArea.load.image('player', '../../Tiles/player.png');
-                wKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.W);
-                sKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.S);
-                aKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.A);
-                dKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.D);
             }
 
             function create() {
@@ -124,6 +120,10 @@
 
             $.connection.hub.start().done(function () {
                 $('#joinGame').click(function () {
+                    wKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.W);
+                    sKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.S);
+                    aKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.A);
+                    dKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.D);
                     gameHub.server.joinRequest($('#playerName').val(), '@Request.UserHostAddress');
                 });
                 $(window).bind('beforeunload', function () {
