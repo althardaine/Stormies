@@ -4,7 +4,7 @@ using Stormies.Models;
 
 namespace Stormies.Hubs
 {
-    public class ChatHub : Hub
+    public class GameHub : Hub
     {
 
         private static readonly GameState GameState = new GameState();
@@ -23,19 +23,22 @@ namespace Stormies.Hubs
             {
                 var player = new Player(playerName);
                 GameState.Join(player, playerIp);
-                Clients.All.updateGameState(GameState);
+                Clients.Others.playerJoined(playerName, playerIp);
+                Clients.Caller.youJoined(GameState);
+                
             }
         }
 
         public void LeaveRequest(string playerIp)
         {
             GameState.Leave(playerIp);
-            Clients.All.updateGameState(GameState);
+            Clients.All.playerLeft(GameState, playerIp);
         }
 
-        public void GetGameState()
+        public void MoveRequest(string playerIp, int x, int y)
         {
-            Clients.Caller.updateGameState(GameState);
+            GameState.Players[playerIp].Move(x, y);
+            Clients.Others.playerMoved(playerIp, x, y);
         }
 
         public void FirstSkillUsed(string playerId)

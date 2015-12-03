@@ -12,13 +12,18 @@ namespace Stormies.Models
         public Player(string name)
         {
             Name = name;
-            Position = new Point(10, 10);
+            Position = new Point(0, 0);
             Health = 100;
         }
 
         public void TakeDamage(int damage)
         {
             Health -= 10;
+        }
+
+        public void Move(int x, int y)
+        {
+            Position = new Point(x, y);
         }
 
     }
