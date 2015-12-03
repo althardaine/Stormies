@@ -18,125 +18,125 @@
 
     <script type="text/javascript">
 
-        $(function() {
+    $(function () {
 
-            window.onload = function() {
+        window.onload = function () {
 
-                var gameHub = $.connection.gameHub;
-                var step = 4;
-                var map;
-                var layer;
-                var cursors;
-                var players = {};
+            var gameHub = $.connection.gameHub;
+            var step = 4;
+            var map;
+            var layer;
+            var cursors;
+            var players = {};
 
 
-                gameHub.client.youJoined = function(gameState) {
-                    $('#yourName').append(htmlEncode("Stormies!!!"));
-                    $('#players').empty();
-                    for (var playerIp in gameState.Players) {
-                        if (playerIp === '@Request.UserHostAddress') {
-                            $('#yourName').append(htmlEncode(" Hello " + gameState.Players[playerIp].Name) +
+            gameHub.client.youJoined = function (gameState) {
+                $('#yourName').append(htmlEncode("Stormies!!!"));
+                $('#players').empty();
+                for (var playerIp in gameState.Players) {
+                    if (playerIp === '@Request.UserHostAddress') {
+                        $('#yourName').append(htmlEncode(" Hello " + gameState.Players[playerIp].Name) +
                                 " Health: " + gameState.Players[playerIp].Health);
-                        }
-                        players[playerIp] = gameArea.add.sprite(gameState.Players[playerIp].PositionX, gameState.Players[playerIp].PositionY, 'player');
-                        $('#players').append('<li>' + htmlEncode(gameState.Players[playerIp].Name) + " " + htmlEncode(playerIp) + '</li>');
-                    };
+                    }
+                    players[playerIp] = gameArea.add.sprite(gameState.Players[playerIp].PositionX, gameState.Players[playerIp].PositionY, 'player');
+                    $('#players').append('<li>' + htmlEncode(gameState.Players[playerIp].Name) + " " + htmlEncode(playerIp) + '</li>');
                 };
+                var player = players['@Request.UserHostAddress'];
+                gameArea.physics.arcade.enable(player);
+                gameArea.camera.follow(player);
+                player.body.velocity.x = 0;
+                player.body.velocity.y = 0;
+            };
 
                 gameHub.client.playerJoined = function(playerIp, player) {
                     $('#players').append('<li>' + htmlEncode(player.Name + " " + playerIp) + '</li>');
                     if (playerIp !== '@Request.UserHostAddress') {
-                        players[playerIp] = gameArea.add.sprite(player.PostionX, player.PositionY, 'player');
-                    }
+                    players[playerIp] = gameArea.add.sprite(player.PostionX, player.PositionY, 'player');
                 }
-
-                gameHub.client.playerLeft = function(gameState, ip) {
-                    $('#players').empty();
-                    for (var playerIp in gameState.Players) {
-                        $('#players').append('<li>' + htmlEncode(gameState.Players[playerIp].Name) + " " + htmlEncode(playerIp) + '</li>');
-                    };
-                    players[ip].destroy();
-                    delete players[ip];
-                };
-
-                gameHub.client.passErrorMessage = function(message) {
-                    alert(message);
-                };
-
-                gameHub.client.playerMoved = function(playerIp, player) {
-                    if (playerIp in players) {
-                        players[playerIp].x = player.PositionX;
-                        players[playerIp].y = player.PositionY;
-                    }
-                }
-
-                var gameArea = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
-
-                function preload() {
-                    gameArea.load.tilemap('stormies', '../../Map/StormiesMap.json', null, Phaser.Tilemap.TILED_JSON);
-                    gameArea.load.image('tiles', '../../Tiles/stormies.png');
-                    gameArea.load.image('player', '../../Tiles/player.png');
-                }
-
-                function create() {
-                    gameArea.stage.backgroundColor = '#787878';
-                    map = gameArea.add.tilemap('stormies');
-                    map.addTilesetImage('StormiesTiles', 'tiles');
-                    layer = map.createLayer('World1');
-                    layer.resizeWorld();
-                    layer.wrap = true;
-
-                    cursors = gameArea.input.keyboard.createCursorKeys();
-                }
-
-                function update() {
-
-                    if ('@Request.UserHostAddress' in players) {
-                        var player = players['@Request.UserHostAddress'];
-
-                        gameArea.physics.arcade.enable(player);
-                        gameArea.camera.follow(player);
-                        player.body.velocity.x = 0;
-                        player.body.velocity.y = 0;
-
-                        if (cursors.left.isDown) {
-                            player.x = player.x - step;
-                        } else if (cursors.right.isDown) {
-                            player.x = player.x + step;
-                        }
-                        if (cursors.up.isDown) {
-                            player.y = player.y - step;
-                        } else if (cursors.down.isDown) {
-                            player.y = player.y + step;
-                        }
-                    }
-                }
-
-                $.connection.hub.start().done(function() {
-                    $('#joinGame').click(function() {
-                        gameHub.server.joinRequest($('#playerName').val(), '@Request.UserHostAddress');
-                    });
-                    $(window).bind('beforeunload', function() {
-                        gameHub.server.leaveRequest('@Request.UserHostAddress');
-                    });
-                    $(document).keypress(function(e) {
-                        if (e.which === 49) {
-                            gameHub.server.firstSkillUsed('@Request.UserHostAddress');
-                        }
-                    });
-                    setInterval(function() {
-                        gameHub.server.moveRequest('@Request.UserHostAddress',
-                            players['@Request.UserHostAddress'].x,
-                            players['@Request.UserHostAddress'].y);
-                    }, 10);
-                });
             }
 
-        });
+            gameHub.client.playerLeft = function (gameState, ip) {
+                $('#players').empty();
+                for (var playerIp in gameState.Players) {
+                    $('#players').append('<li>' + htmlEncode(gameState.Players[playerIp].Name) + " " + htmlEncode(playerIp) + '</li>');
+                };
+                players[ip].destroy();
+                delete players[ip];
+            };
 
-        function htmlEncode(value) {
-            var encodedValue = $('<div />').text(value).html();
-            return encodedValue;
+            gameHub.client.passErrorMessage = function (message) {
+                alert(message);
+            };
+
+            gameHub.client.playerMoved = function (playerIp, player) {
+                if (playerIp in players) {
+                    players[playerIp].x = player.PositionX;
+                    players[playerIp].y = player.PositionY;
+                }
+            }
+
+            var gameArea = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
+
+            function preload() {
+                gameArea.load.tilemap('stormies', '../../Map/StormiesMap.json', null, Phaser.Tilemap.TILED_JSON);
+                gameArea.load.image('tiles', '../../Tiles/stormies.png');
+                gameArea.load.image('player', '../../Tiles/player.png');
+            }
+
+            function create() {
+                gameArea.stage.backgroundColor = '#787878';
+                map = gameArea.add.tilemap('stormies');
+                map.addTilesetImage('StormiesTiles', 'tiles');
+                layer = map.createLayer('World1');
+                layer.resizeWorld();
+                layer.wrap = true;
+
+                cursors = gameArea.input.keyboard.createCursorKeys();
+            }
+
+            function update() {
+
+                if ('@Request.UserHostAddress' in players) {
+                    var player = players['@Request.UserHostAddress'];
+
+                    if (cursors.left.isDown) {
+                        player.x = player.x - step;
+                    } else if (cursors.right.isDown) {
+                        player.x = player.x + step;
+                    }
+                    if (cursors.up.isDown) {
+                        player.y = player.y - step;
+                    } else if (cursors.down.isDown) {
+                        player.y = player.y + step;
+                    }
+                }
+            }
+
+            $.connection.hub.start().done(function () {
+                $('#joinGame').click(function () {
+                    gameHub.server.joinRequest($('#playerName').val(), '@Request.UserHostAddress');
+                });
+                $(window).bind('beforeunload', function () {
+                    gameHub.server.leaveRequest('@Request.UserHostAddress');
+                });
+                $(document).keypress(function (e) {
+                    if (e.which === 49) {
+                        gameHub.server.firstSkillUsed('@Request.UserHostAddress');
+                    }
+                });
+                setInterval(function () {
+                    gameHub.server.moveRequest('@Request.UserHostAddress',
+                        players['@Request.UserHostAddress'].x,
+                        players['@Request.UserHostAddress'].y);
+                }, 10);
+            });
         }
+
+    });
+
+    function htmlEncode(value) {
+        var encodedValue = $('<div />').text(value).html();
+        return encodedValue;
+    }
     </script>
 }
