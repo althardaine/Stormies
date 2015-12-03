@@ -109,6 +109,9 @@
                     } else if (cursors.down.isDown) {
                         player.y = player.y + step;
                     }
+                    gameHub.server.moveRequest('@Request.UserHostAddress',
+                                    player.x,
+                                    player.y);
                 }
             }
 
@@ -119,16 +122,6 @@
                 $(window).bind('beforeunload', function () {
                     gameHub.server.leaveRequest('@Request.UserHostAddress');
                 });
-                $(document).keypress(function (e) {
-                    if (e.which === 49) {
-                        gameHub.server.firstSkillUsed('@Request.UserHostAddress');
-                    }
-                });
-                setInterval(function () {
-                    gameHub.server.moveRequest('@Request.UserHostAddress',
-                        players['@Request.UserHostAddress'].x,
-                        players['@Request.UserHostAddress'].y);
-                }, 10);
             });
         }
 
