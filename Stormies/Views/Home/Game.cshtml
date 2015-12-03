@@ -1,7 +1,9 @@
 ﻿@{
-    ViewBag.Title = "Game";
+    ViewBag.Title = "Stormies";
 }
-<h2 id ="yourName">Stormies!!!</h2>
+
+
+
 <div class="container">
     <input type="text" id="playerName" />
     <input type="button" id="joinGame" value="Join"/>
@@ -28,6 +30,7 @@
             var layer;
             var cursors;
             var players = {};
+            var wKey, sKey, aKey, dKey;
 
 
             gameHub.client.youJoined = function (gameState) {
@@ -81,6 +84,10 @@
                 gameArea.load.tilemap('stormies', '../../Map/StormiesMap.json', null, Phaser.Tilemap.TILED_JSON);
                 gameArea.load.image('tiles', '../../Tiles/stormies.png');
                 gameArea.load.image('player', '../../Tiles/player.png');
+                wKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.W);
+                sKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.S);
+                aKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.A);
+                dKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.D);
             }
 
             function create() {
@@ -99,14 +106,14 @@
                 if ('@Request.UserHostAddress' in players) {
                     var player = players['@Request.UserHostAddress'];
 
-                    if (cursors.left.isDown) {
+                    if (aKey.isDown) {
                         player.x = player.x - step;
-                    } else if (cursors.right.isDown) {
+                    } else if (dKey.isDown) {
                         player.x = player.x + step;
                     }
-                    if (cursors.up.isDown) {
+                    if (wKey.isDown) {
                         player.y = player.y - step;
-                    } else if (cursors.down.isDown) {
+                    } else if (sKey.isDown) {
                         player.y = player.y + step;
                     }
                     gameHub.server.moveRequest('@Request.UserHostAddress',
