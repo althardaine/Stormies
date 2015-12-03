@@ -23,7 +23,7 @@ namespace Stormies.Hubs
             {
                 var player = new Player(playerName);
                 GameState.Join(player, playerIp);
-                Clients.Others.playerJoined(playerName, playerIp);
+                Clients.All.playerJoined(playerIp, player);
                 Clients.Caller.youJoined(GameState);
                 
             }
@@ -37,8 +37,9 @@ namespace Stormies.Hubs
 
         public void MoveRequest(string playerIp, int x, int y)
         {
+            if (!GameState.Players.ContainsKey(playerIp)) return;
             GameState.Players[playerIp].Move(x, y);
-            Clients.Others.playerMoved(playerIp, x, y);
+            Clients.Others.playerMoved(playerIp, GameState.Players[playerIp]);
         }
 
         public void FirstSkillUsed(string playerId)

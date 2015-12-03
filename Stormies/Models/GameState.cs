@@ -7,22 +7,32 @@ namespace Stormies.Models
         public Dictionary<string, Player> Players { get; private set; }
         public int BlueScore { get; private set; }
         public int RedScore { get; private set; }
+        private readonly object _syncLock = new object();
 
         public GameState()
         {
-            Players = new Dictionary<string, Player>();
-            BlueScore = 0;
-            RedScore = 0;
+            lock (_syncLock)
+            {
+                Players = new Dictionary<string, Player>();
+                BlueScore = 0;
+                RedScore = 0;
+            }
         }
 
         public void Join(Player player, string playerIp)
         {
-            Players[playerIp] = player;
+            lock (_syncLock)
+            {
+                Players[playerIp] = player;
+            }
         }
 
         public void Leave(string playerIp)
         {
-            Players.Remove(playerIp);
+            lock (_syncLock)
+            {
+                Players.Remove(playerIp);
+            }
         }
 
     }
