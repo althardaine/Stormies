@@ -31,7 +31,8 @@
                 window.onload = function () {
 
                     var gameHub = $.connection.gameHub;
-                    var step = 1;
+                    var speed = 300;
+                    var rotationSpeed = 300;
                     var map;
                     var layer;
                     var cursors;
@@ -48,6 +49,8 @@
                                         " Health: " + gameState.Players[playerIp].Health);
                             }
                             players[playerIp] = gameArea.add.sprite(gameState.Players[playerIp].PositionX, gameState.Players[playerIp].PositionY, 'player');
+                            players[playerIp].anchor.set(0.5);
+                            players[playerIp].angle = gameState.Players[playerIp].Angle;
                             $('#players').append('<li>' + htmlEncode(gameState.Players[playerIp].Name) + " " + htmlEncode(playerIp) + '</li>');
                         };
                         var player = players['@Request.UserHostAddress'];
@@ -61,6 +64,7 @@
                         $('#players').append('<li>' + htmlEncode(player.Name + " " + playerIp) + '</li>');
                         if (playerIp !== '@Request.UserHostAddress') {
                             players[playerIp] = gameArea.add.sprite(player.PostionX, player.PositionY, 'player');
+                            players[playerIp].anchor.set(0.5);
                         }
                     }
 
@@ -81,6 +85,7 @@
                         if (playerIp in players) {
                             players[playerIp].x = player.PositionX;
                             players[playerIp].y = player.PositionY;
+                            players[playerIp].angle = player.Angle;
                         }
                     }
 
@@ -94,8 +99,11 @@
 
                     function create() {
                         gameArea.stage.backgroundColor = '#787878';
+
                         map = gameArea.add.tilemap('stormies');
                         map.addTilesetImage('StormiesTiles', 'tiles');
+
+
                         layer = map.createLayer('World1');
                         layer.resizeWorld();
                         layer.wrap = true;
@@ -108,19 +116,21 @@
                         if ('@Request.UserHostAddress' in players) {
                             var player = players['@Request.UserHostAddress'];
 
+                            player.body.velocity.x = 0;
+                            player.body.velocity.y = 0;
+                            player.body.angularVelocity = 0;
+
                             if (aKey.isDown) {
-                                player.x = player.x - step;
+                                player.body.angularVelocity = -rotationSpeed;
                             } else if (dKey.isDown) {
-                                player.x = player.x + step;
+                                player.body.angularVelocity = rotationSpeed;
                             }
                             if (wKey.isDown) {
-                                player.y = player.y - step;
+                                gameArea.physics.arcade.velocityFromAngle(player.angle, speed, player.body.velocity);
                             } else if (sKey.isDown) {
-                                player.y = player.y + step;
+                                gameArea.physics.arcade.velocityFromAngle(player.angle, -speed/2, player.body.velocity);
                             }
-                            gameHub.server.moveRequest('@Request.UserHostAddress',
-                                            player.x,
-                                            player.y);
+                            gameHub.server.moveRequest('@Request.UserHostAddress', player.x, player.y, player.angle);
                         }
                     }
 

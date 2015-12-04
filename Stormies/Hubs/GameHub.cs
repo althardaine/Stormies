@@ -35,10 +35,10 @@ namespace Stormies.Hubs
             Clients.All.playerLeft(GameState, playerIp);
         }
 
-        public void MoveRequest(string playerIp, int x, int y)
+        public void MoveRequest(string playerIp, double x, double y, double angle)
         {
             if (!GameState.Players.ContainsKey(playerIp)) return;
-            GameState.Players[playerIp].Move(x, y);
+            GameState.Players[playerIp].Move(x, y, angle);
             Clients.Others.playerMoved(playerIp, GameState.Players[playerIp]);
         }
 

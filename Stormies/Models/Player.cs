@@ -4,8 +4,9 @@
     {
 
         public string Name { get; private set; }
-        public int PositionX { get; private set; }
-        public int PositionY { get; private set; }
+        public double PositionX { get; private set; }
+        public double PositionY { get; private set; }
+        public double Angle { get; private set; }
         public int Health { get; private set; }
         private readonly object _syncLock = new object();
 
@@ -14,6 +15,7 @@
             Name = name;
             PositionX = 0;
             PositionY = 0;
+            Angle = 0;
             Health = 100;
         }
 
@@ -25,12 +27,13 @@
             }
         }
 
-        public void Move(int x, int y)
+        public void Move(double x, double y, double angle)
         {
             lock (_syncLock)
             {
                 PositionX = x;
                 PositionY = y;
+                Angle = angle;
             }
         }
 
