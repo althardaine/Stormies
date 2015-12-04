@@ -35,19 +35,13 @@
                     var rotationSpeed = 300;
                     var map;
                     var layer;
-                    var cursors;
                     var players = {};
                     var wKey, sKey, aKey, dKey;
 
 
                     gameHub.client.youJoined = function (gameState) {
-                        $('#yourName').append(htmlEncode("Stormies!!!"));
                         $('#players').empty();
                         for (var playerIp in gameState.Players) {
-                            if (playerIp === '@Request.UserHostAddress') {
-                                $('#yourName').append(htmlEncode(" Hello " + gameState.Players[playerIp].Name) +
-                                        " Health: " + gameState.Players[playerIp].Health);
-                            }
                             players[playerIp] = gameArea.add.sprite(gameState.Players[playerIp].PositionX, gameState.Players[playerIp].PositionY, 'player');
                             players[playerIp].anchor.set(0.5);
                             players[playerIp].angle = gameState.Players[playerIp].Angle;
@@ -108,8 +102,6 @@
                         layer = map.createLayer('World1');
                         layer.resizeWorld();
                         layer.wrap = true;
-
-                        cursors = gameArea.input.keyboard.createCursorKeys();
                     }
 
                     function update() {
@@ -129,9 +121,10 @@
                             if (wKey.isDown) {
                                 gameArea.physics.arcade.velocityFromAngle(player.angle, speed, player.body.velocity);
                             } else if (sKey.isDown) {
-                                gameArea.physics.arcade.velocityFromAngle(player.angle, -speed/2, player.body.velocity);
+                                gameArea.physics.arcade.velocityFromAngle(player.angle, -speed / 2, player.body.velocity);
                             }
                             gameHub.server.moveRequest('@Request.UserHostAddress', player.x, player.y, player.angle);
+                            
                         }
                     }
 
