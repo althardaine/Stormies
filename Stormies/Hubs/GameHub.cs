@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Drawing;
+using System.Linq;
 using Microsoft.AspNet.SignalR;
 using Stormies.Models;
 
@@ -9,22 +11,19 @@ namespace Stormies.Hubs
 
         private static readonly GameState GameState = new GameState();
 
-        public void JoinRequest(string playerName, string playerIp)
+        public void JoinRequest(string playerName)
         {
-            if (GameState.Players.ContainsKey(playerIp))
-            {
-                Clients.Caller.passErrorMessage("You are already connected!");
-            }
-            else if (GameState.Players.Values.ToList().Find(p => p.Name == playerName) != null)
+            var playerId = Guid.NewGuid().ToString();
+            if (GameState.Players.Values.ToList().Find(p => p.Name == playerName) != null)
             {
                 Clients.Caller.passErrorMessage("Player with that name already exist!");
             }
             else
             {
                 var player = new Player(playerName);
-                GameState.Join(player, playerIp);
-                Clients.All.playerJoined(playerIp, player);
-                Clients.Caller.youJoined(GameState);
+                GameState.Join(player, playerId);
+                Clients.Others.playerJoined(playerId, player);
+                Clients.Caller.youJoined(playerId, GameState);
                 
             }
         }

@@ -19,19 +19,19 @@ namespace Stormies.Models
             }
         }
 
-        public void Join(Player player, string playerIp)
+        public void Join(Player player, string id)
         {
             lock (_syncLock)
             {
-                Players[playerIp] = player;
+                Players[id] = player;
             }
         }
 
-        public void Leave(string playerIp)
+        public void Leave(string playerId)
         {
             lock (_syncLock)
             {
-                Players.Remove(playerIp);
+                Players.Remove(playerId);
             }
         }
 

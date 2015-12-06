@@ -13,8 +13,8 @@
         public Player(string name)
         {
             Name = name;
-            PositionX = 0;
-            PositionY = 0;
+            PositionX = 20;
+            PositionY = 20;
             Angle = 0;
             Health = 100;
         }
