@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.SignalR;
 using Stormies.Models;
@@ -10,17 +10,23 @@ namespace Stormies.Hubs
     {
 
         private static readonly GameState GameState = new GameState();
+        private static readonly Dictionary<string, string> ConnectionToId = new Dictionary<string, string>();
 
         public void JoinRequest(string playerName)
         {
-            var playerId = Guid.NewGuid().ToString();
             if (GameState.Players.Values.ToList().Find(p => p.Name == playerName) != null)
             {
                 Clients.Caller.passErrorMessage("Player with that name already exist!");
+            } 
+            if (ConnectionToId.ContainsKey(Context.ConnectionId))
+            {
+                Clients.Caller.passErrorMessage("You are already in the game!");
             }
             else
             {
+                var playerId = Guid.NewGuid().ToString();
                 var player = new Player(playerName);
+                ConnectionToId[Context.ConnectionId] = playerId;
                 GameState.Join(player, playerId);
                 Clients.Others.playerJoined(playerId, player);
                 Clients.Caller.youJoined(playerId, GameState);
@@ -28,24 +34,27 @@ namespace Stormies.Hubs
             }
         }
 
-        public void LeaveRequest(string playerIp)
+        public void LeaveRequest()
         {
-            GameState.Leave(playerIp);
-            Clients.All.playerLeft(GameState, playerIp);
+            var connectionId = Context.ConnectionId;
+            if (!ConnectionToId.ContainsKey(connectionId)) return;
+
+            var playerId = ConnectionToId[connectionId];
+            ConnectionToId.Remove(connectionId);
+            GameState.Leave(playerId);
+            Clients.All.playerLeft(GameState, playerId);
         }
 
-        public void MoveRequest(string playerIp, double x, double y, double angle)
+        public void MoveRequest(double x, double y, double angle)
         {
-            if (!GameState.Players.ContainsKey(playerIp)) return;
-            GameState.Players[playerIp].Move(x, y, angle);
-            Clients.Others.playerMoved(playerIp, GameState.Players[playerIp]);
-        }
+            var connectionId = Context.ConnectionId;
+            if (!ConnectionToId.ContainsKey(Context.ConnectionId)) return;
 
-        public void FirstSkillUsed(string playerId)
-        {
+            var playerId = ConnectionToId[connectionId];
             if (!GameState.Players.ContainsKey(playerId)) return;
-            GameState.Players[playerId].TakeDamage(10);
-            Clients.All.updateGameState(GameState);
+
+            GameState.Players[playerId].Move(x, y, angle);
+            Clients.Others.playerMoved(playerId, GameState.Players[playerId]);
         }
     }
 }

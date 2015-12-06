@@ -125,7 +125,7 @@
                             } else if (sKey.isDown) {
                                 gameArea.physics.arcade.velocityFromAngle(player.angle, -speed / 2, player.body.velocity);
                             }
-                            gameHub.server.moveRequest(myId, player.x, player.y, player.angle);
+                            gameHub.server.moveRequest(player.x, player.y, player.angle);
                             
                         }
                     }
@@ -139,7 +139,7 @@
                             gameHub.server.joinRequest($('#playerName').val());
                         });
                         $(window).bind('beforeunload', function () {
-                            gameHub.server.leaveRequest(myId);
+                            gameHub.server.leaveRequest();
                         });
                     });
                 }
