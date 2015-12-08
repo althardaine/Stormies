@@ -65,7 +65,7 @@ namespace Stormies.Hubs
             var playerId = ConnectionToId[connectionId];
             if (!GameState.Players.ContainsKey(playerId)) return;
 
-            if (GameState.Players[playerId].UseFirstSkill(GameState))
+            if (GameState.Players[playerId].UseFirstSkill(GameState, playerId))
             {
                 Clients.All.playerUsedFirstSkill(playerId, GameState.Players[playerId]);
             }

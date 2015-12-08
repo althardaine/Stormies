@@ -1,27 +1,19 @@
 ﻿using System;
 using Stormies.Extensions;
+using Stormies.Models.CharacterClasses.Skills;
+using Stormies.Models.CharacterClasses.Skills.Warrior;
 
 namespace Stormies.Models.CharacterClasses
 {
-    public class Warrior : CharacterClass
+    public class Warrior : ICharacterClass
     {
 
-        public Warrior()
+        private readonly Skill _firstSkill = new Slash();
+
+        public bool UseFirstSkill(GameState gameState, string playerId)
         {
-            FirstSkillCooldown = 1000;
+            return _firstSkill.Use(gameState, playerId);
         }
 
-        public override bool UseFirstSkill()
-        {
-            var now = DateTime.Now.ToMilliseconds();
-            if (FirstSkillLastUsed == 0)
-            {
-                FirstSkillLastUsed = now;
-                return true;
-            }
-            if (now - FirstSkillLastUsed < FirstSkillCooldown) return false;
-            FirstSkillLastUsed = now;
-            return true;
-        }
     }
 }
