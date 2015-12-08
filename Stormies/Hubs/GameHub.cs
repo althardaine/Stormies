@@ -18,7 +18,7 @@ namespace Stormies.Hubs
             {
                 Clients.Caller.passErrorMessage("Player with that name already exist!");
             } 
-            if (ConnectionToId.ContainsKey(Context.ConnectionId))
+            else if (ConnectionToId.ContainsKey(Context.ConnectionId))
             {
                 Clients.Caller.passErrorMessage("You are already in the game!");
             }
@@ -67,7 +67,7 @@ namespace Stormies.Hubs
 
             if (GameState.Players[playerId].UseSkill(GameState, playerId, skillId))
             {
-                Clients.All.playerUsedFirstSkill(playerId, GameState.Players[playerId]);
+                Clients.All.playerUsedFirstSkill(playerId, GameState);
             }
         }
     }

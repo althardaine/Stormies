@@ -13,11 +13,10 @@
 
     <div class="container" style="background: black">
         <input type="text" id="playerName" />
-        <input type="button" id="joinGame" value="Join" />
-        <ul id="players"></ul>
+        <input type="button" id="joinGame" value="Join"/>
+        <div style="color: white" id="yourHealth"></div>
+        <ul style ="color: white" id="players"></ul>
     </div>
-
-    <div id="game-area"></div>
 
     @section scripts {
         <script src="../../Scripts/jquery.signalR-2.2.0.min.js"></script>
@@ -26,9 +25,9 @@
 
         <script type="text/javascript">
 
-            $(function () {
+            $(function() {
 
-                window.onload = function () {
+                window.onload = function() {
 
                     var gameHub = $.connection.gameHub;
                     var speed = 300;
@@ -41,7 +40,7 @@
                     var swordSound;
 
 
-                    gameHub.client.youJoined = function (id, gameState) {
+                    gameHub.client.youJoined = function(id, gameState) {
                         myId = id;
                         $('#players').empty();
                         for (var playerId in gameState.Players) {
@@ -50,6 +49,7 @@
                             players[playerId].angle = gameState.Players[playerId].Angle;
                             $('#players').append('<li>' + htmlEncode(gameState.Players[playerId].Name) + " " + htmlEncode(playerId) + '</li>');
                         };
+                        $('#yourHealth').append(htmlEncode(gameState.Players[myId].Health));
                         var player = players[myId];
                         gameArea.physics.arcade.enable(player);
                         gameArea.camera.follow(player);
@@ -58,7 +58,7 @@
                         player.body.collideWorldBounds = true;
                     };
 
-                    gameHub.client.playerJoined = function (playerId, player) {
+                    gameHub.client.playerJoined = function(playerId, player) {
                         $('#players').append('<li>' + htmlEncode(player.Name + " " + playerId) + '</li>');
                         if (playerId !== myId) {
                             players[playerId] = gameArea.add.sprite(player.PostionX, player.PositionY, 'player');
@@ -66,7 +66,7 @@
                         }
                     }
 
-                    gameHub.client.playerLeft = function (gameState, id) {
+                    gameHub.client.playerLeft = function(gameState, id) {
                         $('#players').empty();
                         for (var playerId in gameState.Players) {
                             $('#players').append('<li>' + htmlEncode(gameState.Players[playerId].Name) + " " + htmlEncode(playerId) + '</li>');
@@ -75,11 +75,11 @@
                         delete players[id];
                     };
 
-                    gameHub.client.passErrorMessage = function (message) {
+                    gameHub.client.passErrorMessage = function(message) {
                         alert(message);
                     };
 
-                    gameHub.client.playerMoved = function (playerId, player) {
+                    gameHub.client.playerMoved = function(playerId, player) {
                         if (playerId in players) {
                             players[playerId].x = player.PositionX;
                             players[playerId].y = player.PositionY;
@@ -87,7 +87,10 @@
                         }
                     }
 
-                    gameHub.client.playerUsedFirstSkill = function(playerId, player) {
+                    gameHub.client.playerUsedFirstSkill = function (playerId, gameState) {
+                        $('#yourHealth').empty();
+                        $('#yourHealth').append(htmlEncode(gameState.Players[myId].Health));
+                        var player = gameState.Players[playerId];
                         var skill1 = gameArea.add.sprite(player.PositionX, player.PositionY, 'skill1');
                         skill1.anchor.set(0.5);
                         skill1.angle = player.Angle;
@@ -150,15 +153,15 @@
                             }
                             gameHub.server.moveRequest(player.x, player.y, player.angle);
 
-                            if(oneKey.isDown) {
+                            if (oneKey.isDown) {
                                 gameHub.server.useSkillRequest(0);
                             }
-                            
+
                         }
                     }
 
-                    $.connection.hub.start().done(function () {
-                        $('#joinGame').click(function () {
+                    $.connection.hub.start().done(function() {
+                        $('#joinGame').click(function() {
                             wKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.W);
                             sKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.S);
                             aKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -166,7 +169,7 @@
                             oneKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.ONE);
                             gameHub.server.joinRequest($('#playerName').val());
                         });
-                        $(window).bind('beforeunload', function () {
+                        $(window).bind('beforeunload', function() {
                             gameHub.server.leaveRequest();
                         });
                     });

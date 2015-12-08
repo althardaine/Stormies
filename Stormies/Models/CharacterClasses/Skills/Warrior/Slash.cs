@@ -5,18 +5,9 @@ namespace Stormies.Models.CharacterClasses.Skills.Warrior
 {
     public class Slash : Skill
     {
-
-        public override bool Use(GameState gameState, string playerId)
+        protected override void Execute(GameState gameState, string playerId)
         {
-            var now = DateTime.Now.ToMilliseconds();
-            if (LastUsed == 0)
-            {
-                LastUsed = now;
-                return true;
-            }
-            if (now - LastUsed < Cooldown) return false;
-            LastUsed = now;
-            return true;
+            gameState.Players[playerId].TakeDamage(10);
         }
 
         public override string Name()
