@@ -1,4 +1,6 @@
-﻿namespace Stormies.Models
+﻿using Stormies.Models.CharacterClasses;
+
+namespace Stormies.Models
 {
     public class Player
     {
@@ -8,6 +10,7 @@
         public double PositionY { get; private set; }
         public double Angle { get; private set; }
         public int Health { get; private set; }
+        public CharacterClass CharacterClass { get; private set; }
         private readonly object _syncLock = new object();
 
         public Player(string name)
@@ -16,6 +19,7 @@
             PositionX = 20;
             PositionY = 20;
             Angle = 0;
+            CharacterClass = new Warrior();
             Health = 100;
         }
 
@@ -23,7 +27,7 @@
         {
             lock (_syncLock)
             {
-                Health -= 10;
+                Health -= damage;
             }
         }
 
@@ -35,6 +39,11 @@
                 PositionY = y;
                 Angle = angle;
             }
+        }
+
+        public bool UseFirstSkill(GameState gameState)
+        {
+            return CharacterClass.UseFirstSkill();
         }
 
     }

@@ -37,7 +37,8 @@
                     var map;
                     var layer;
                     var players = {};
-                    var wKey, sKey, aKey, dKey;
+                    var wKey, sKey, aKey, dKey, oneKey;
+                    var swordSound;
 
 
                     gameHub.client.youJoined = function (id, gameState) {
@@ -86,12 +87,30 @@
                         }
                     }
 
+                    gameHub.client.playerUsedFirstSkill = function(playerId, player) {
+                        var skill1 = gameArea.add.sprite(player.PositionX, player.PositionY, 'skill1');
+                        skill1.anchor.set(0.5);
+                        skill1.angle = player.Angle;
+                        var skill1Animation = skill1.animations.add('slash');
+
+                        //  And this starts the animation playing by using its key ("walk")
+                        //  30 is the frame rate (30fps)
+                        //  true means it will loop when it finishes
+                        skill1Animation.killOnComplete = true;
+                        //                                this.game.add.tween(skill1Animation).to({ x: player.x, y: player.y }, 1000, Phaser.Easing.Quadratic.InOut, true);
+                        skill1.animations.play('slash', 20, false);
+                        swordSound.play();
+                    }
+
                     var gameArea = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
                     function preload() {
                         gameArea.load.tilemap('stormies', '../../Map/StormiesMap.json', null, Phaser.Tilemap.TILED_JSON);
                         gameArea.load.image('tiles', '../../Tiles/stormies.png');
                         gameArea.load.image('player', '../../Tiles/warrior.png');
+                        gameArea.load.spritesheet('skill1', '../../Tiles/warrior-skill-1.png', 160, 160, 5);
+
+                        gameArea.load.audio('sword', '../../Sound/sword.mp3');
                     }
 
                     function create() {
@@ -99,6 +118,10 @@
 
                         map = gameArea.add.tilemap('stormies');
                         map.addTilesetImage('StormiesTiles', 'tiles');
+
+//                        
+                        //                        skill1.animations.play('anim', 30, true);
+                        swordSound = gameArea.add.audio('sword');
 
 
                         layer = map.createLayer('World1');
@@ -126,6 +149,10 @@
                                 gameArea.physics.arcade.velocityFromAngle(player.angle, -speed / 2, player.body.velocity);
                             }
                             gameHub.server.moveRequest(player.x, player.y, player.angle);
+
+                            if(oneKey.isDown) {
+                                gameHub.server.firstSkillUseRequest();
+                            }
                             
                         }
                     }
@@ -136,6 +163,7 @@
                             sKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.S);
                             aKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.A);
                             dKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.D);
+                            oneKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.ONE);
                             gameHub.server.joinRequest($('#playerName').val());
                         });
                         $(window).bind('beforeunload', function () {

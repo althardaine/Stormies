@@ -56,5 +56,19 @@ namespace Stormies.Hubs
             GameState.Players[playerId].Move(x, y, angle);
             Clients.Others.playerMoved(playerId, GameState.Players[playerId]);
         }
+
+        public void FirstSkillUseRequest()
+        {
+            var connectionId = Context.ConnectionId;
+            if (!ConnectionToId.ContainsKey(Context.ConnectionId)) return;
+
+            var playerId = ConnectionToId[connectionId];
+            if (!GameState.Players.ContainsKey(playerId)) return;
+
+            if (GameState.Players[playerId].UseFirstSkill(GameState))
+            {
+                Clients.All.playerUsedFirstSkill(playerId, GameState.Players[playerId]);
+            }
+        }
     }
 }

@@ -146,10 +146,13 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\GameHub.cs" />
+    <Compile Include="Models\CharacterClasses\CharacterClass.cs" />
+    <Compile Include="Models\CharacterClasses\Warrior.cs" />
     <Compile Include="Models\GameState.cs" />
     <Compile Include="Models\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -272,8 +275,10 @@
     <Content Include="Scripts\_references.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Sound\sword.mp3" />
     <Content Include="Tiles\player.png" />
     <Content Include="Tiles\stormies.png" />
+    <Content Include="Tiles\warrior-skill-1.png" />
     <Content Include="Tiles\warrior.png" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
