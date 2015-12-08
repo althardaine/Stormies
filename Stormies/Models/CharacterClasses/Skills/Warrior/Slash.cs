@@ -1,13 +1,31 @@
 ﻿using System;
-using Stormies.Extensions;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Stormies.Models.CharacterClasses.Skills.Warrior
 {
     public class Slash : Skill
     {
+
+        private const int Damage = 10;
+        private const int Range = 80;
+
         protected override void Execute(GameState gameState, string playerId)
         {
-            gameState.Players[playerId].TakeDamage(10);
+            var user = gameState.Players[playerId];
+            foreach (var player in gameState.Players.Where(entry => entry.Key != playerId).Select(entry => entry.Value).Where(player => PlayerInRange(user, player)))
+            {
+                player.TakeDamage(Damage);
+            }
+        }
+
+        private static bool PlayerInRange(Player user, Player player)
+        {
+            var radianAngle = (user.Angle + 90)*Math.PI/180;
+            var bx = user.PositionX + Range * Math.Sin(radianAngle);
+            var by = Math.Sqrt(Math.Pow(Range, 2) - Math.Pow(user.PositionX - bx, 2)) + user.PositionY;
+            var scalar = ((bx - user.PositionX) * (player.PositionX - user.PositionX)) + ((by - user.PositionY) * (player.PositionY - user.PositionY));
+            return Math.Pow((player.PositionX - user.PositionX), 2) + Math.Pow((player.PositionY - user.PositionY), 2) <= Math.Pow(Range, 2) && scalar >= 0;
         }
 
         public override string Name()
