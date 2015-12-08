@@ -19,5 +19,15 @@ namespace Stormies.Models.CharacterClasses.Skills.Warrior
             return true;
         }
 
+        public override string Name()
+        {
+            return "Slash";
+        }
+
+        public override string Description()
+        {
+            return "Slashes all enemies in front of you for moderate damage.";
+        }
+
     }
 }

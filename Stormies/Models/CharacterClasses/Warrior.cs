@@ -1,18 +1,22 @@
-﻿using System;
-using Stormies.Extensions;
+﻿using System.Collections.Generic;
 using Stormies.Models.CharacterClasses.Skills;
 using Stormies.Models.CharacterClasses.Skills.Warrior;
 
 namespace Stormies.Models.CharacterClasses
 {
-    public class Warrior : ICharacterClass
+    public class Warrior : CharacterClass
     {
 
-        private readonly Skill _firstSkill = new Slash();
+        private readonly List<Skill> _skills = new List<Skill> {new Slash()};
 
-        public bool UseFirstSkill(GameState gameState, string playerId)
+        public Warrior()
         {
-            return _firstSkill.Use(gameState, playerId);
+            Health = 100;
+        }
+
+        public override bool UseSkill(GameState gameState, string playerId, int skillId)
+        {
+            return _skills.Count > skillId && _skills[skillId].Use(gameState, playerId);
         }
 
     }

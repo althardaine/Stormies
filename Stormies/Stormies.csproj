@@ -151,7 +151,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\GameHub.cs" />
-    <Compile Include="Models\CharacterClasses\ICharacterClass.cs" />
+    <Compile Include="Models\CharacterClasses\CharacterClass.cs" />
     <Compile Include="Models\CharacterClasses\Skills\Skill.cs" />
     <Compile Include="Models\CharacterClasses\Skills\Warrior\Slash.cs" />
     <Compile Include="Models\CharacterClasses\Warrior.cs" />

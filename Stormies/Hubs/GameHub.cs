@@ -57,7 +57,7 @@ namespace Stormies.Hubs
             Clients.Others.playerMoved(playerId, GameState.Players[playerId]);
         }
 
-        public void FirstSkillUseRequest()
+        public void UseSkillRequest(int skillId)
         {
             var connectionId = Context.ConnectionId;
             if (!ConnectionToId.ContainsKey(Context.ConnectionId)) return;
@@ -65,7 +65,7 @@ namespace Stormies.Hubs
             var playerId = ConnectionToId[connectionId];
             if (!GameState.Players.ContainsKey(playerId)) return;
 
-            if (GameState.Players[playerId].UseFirstSkill(GameState, playerId))
+            if (GameState.Players[playerId].UseSkill(GameState, playerId, skillId))
             {
                 Clients.All.playerUsedFirstSkill(playerId, GameState.Players[playerId]);
             }
