@@ -30,15 +30,12 @@
                 window.onload = function() {
 
                     var gameHub = $.connection.gameHub;
-                    var speed = 300;
-                    var rotationSpeed = 300;
                     var myId;
                     var map;
                     var layer;
                     var players = {};
                     var wKey, sKey, aKey, dKey, oneKey;
                     var swordSound;
-
 
                     gameHub.client.youJoined = function(id, gameState) {
                         myId = id;
@@ -51,11 +48,7 @@
                         };
                         $('#yourHealth').append(htmlEncode(gameState.Players[myId].Health));
                         var player = players[myId];
-                        gameArea.physics.arcade.enable(player);
                         gameArea.camera.follow(player);
-                        player.body.velocity.x = 0;
-                        player.body.velocity.y = 0;
-                        player.body.collideWorldBounds = true;
                     };
 
                     gameHub.client.playerJoined = function(playerId, player) {
@@ -95,12 +88,7 @@
                         skill1.anchor.set(0.5);
                         skill1.angle = player.Angle;
                         var skill1Animation = skill1.animations.add('slash');
-
-                        //  And this starts the animation playing by using its key ("walk")
-                        //  30 is the frame rate (30fps)
-                        //  true means it will loop when it finishes
                         skill1Animation.killOnComplete = true;
-                        //                                this.game.add.tween(skill1Animation).to({ x: player.x, y: player.y }, 1000, Phaser.Easing.Quadratic.InOut, true);
                         skill1.animations.play('slash', 20, false);
                         swordSound.play();
                     }
@@ -122,8 +110,6 @@
                         map = gameArea.add.tilemap('stormies');
                         map.addTilesetImage('StormiesTiles', 'tiles');
 
-//                        
-                        //                        skill1.animations.play('anim', 30, true);
                         swordSound = gameArea.add.audio('sword');
 
 
@@ -135,28 +121,20 @@
                     function update() {
 
                         if (myId in players) {
-                            var player = players[myId];
-
-                            player.body.velocity.x = 0;
-                            player.body.velocity.y = 0;
-                            player.body.angularVelocity = 0;
-
                             if (aKey.isDown) {
-                                player.body.angularVelocity = -rotationSpeed;
+                                gameHub.server.rotateLeftRequest();
                             } else if (dKey.isDown) {
-                                player.body.angularVelocity = rotationSpeed;
+                                gameHub.server.rotateRightRequest();
                             }
                             if (wKey.isDown) {
-                                gameArea.physics.arcade.velocityFromAngle(player.angle, speed, player.body.velocity);
+                                gameHub.server.moveForewardRequest();
                             } else if (sKey.isDown) {
-                                gameArea.physics.arcade.velocityFromAngle(player.angle, -speed / 2, player.body.velocity);
+                                gameHub.server.moveBackwardRequest();
                             }
-                            gameHub.server.moveRequest(player.x, player.y, player.angle);
 
                             if (oneKey.isDown) {
                                 gameHub.server.useSkillRequest(0);
                             }
-
                         }
                     }
 

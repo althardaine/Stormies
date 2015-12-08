@@ -1,4 +1,5 @@
-﻿using Stormies.Models.CharacterClasses;
+﻿using System;
+using Stormies.Models.CharacterClasses;
 
 namespace Stormies.Models
 {
@@ -9,8 +10,10 @@ namespace Stormies.Models
         public double PositionX { get; private set; }
         public double PositionY { get; private set; }
         public double Angle { get; private set; }
+        public double Speed { get; private set; }
         public int Health { get; private set; }
         public CharacterClass CharacterClass { get; private set; }
+        private const double RotationSpeed = 4;
         private readonly object _syncLock = new object();
 
         public Player(string name)
@@ -21,6 +24,7 @@ namespace Stormies.Models
             Angle = 0;
             CharacterClass = new Warrior();
             Health = CharacterClass.Health;
+            Speed = CharacterClass.Speed;
         }
 
         public void TakeDamage(int damage)
@@ -31,19 +35,48 @@ namespace Stormies.Models
             }
         }
 
-        public void Move(double x, double y, double angle)
+        public void MoveForeward()
         {
             lock (_syncLock)
             {
-                PositionX = x;
-                PositionY = y;
-                Angle = angle;
+                var radianAngle = Angle * Math.PI / 180;
+                PositionX += Math.Cos(radianAngle) * Speed;
+                PositionY += Math.Sin(radianAngle) * Speed;
+            }
+        }
+
+        public void MoveBackward()
+        {
+            lock (_syncLock)
+            {
+                var radianAngle = Angle * Math.PI / 180;
+                PositionX -= Math.Cos(radianAngle) * Speed/2;
+                PositionY -= Math.Sin(radianAngle) * Speed/2;
+            }
+        }
+
+        public void RotateRight()
+        {
+            lock (_syncLock)
+            {
+                Angle += RotationSpeed;
+            }
+        }
+
+        public void RotateLeft()
+        {
+            lock (_syncLock)
+            {
+                Angle -= RotationSpeed;
             }
         }
 
         public bool UseSkill(GameState gameState, string playerId, int skillId)
         {
-            return CharacterClass.UseSkill(gameState, playerId, skillId);
+            lock (_syncLock)
+            {
+                return CharacterClass.UseSkill(gameState, playerId, skillId);
+            }
         }
 
     }

@@ -12,6 +12,7 @@ namespace Stormies.Models.CharacterClasses
         public Warrior()
         {
             Health = 100;
+            Speed = 2.0;
         }
 
         public override bool UseSkill(GameState gameState, string playerId, int skillId)

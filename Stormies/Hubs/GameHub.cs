@@ -45,30 +45,68 @@ namespace Stormies.Hubs
             Clients.All.playerLeft(GameState, playerId);
         }
 
-        public void MoveRequest(double x, double y, double angle)
+        public void MoveForewardRequest()
         {
-            var connectionId = Context.ConnectionId;
-            if (!ConnectionToId.ContainsKey(Context.ConnectionId)) return;
+            string playerId;
+            if (!VerifyConnection(out playerId)) return;
 
-            var playerId = ConnectionToId[connectionId];
-            if (!GameState.Players.ContainsKey(playerId)) return;
+            var player = GameState.Players[playerId];
+            player.MoveForeward();
+            Clients.All.playerMoved(playerId, GameState.Players[playerId]);
+        }
 
-            GameState.Players[playerId].Move(x, y, angle);
-            Clients.Others.playerMoved(playerId, GameState.Players[playerId]);
+        public void MoveBackwardRequest()
+        {
+            string playerId;
+            if (!VerifyConnection(out playerId)) return;
+
+            var player = GameState.Players[playerId];
+            player.MoveBackward();
+            Clients.All.playerMoved(playerId, GameState.Players[playerId]);
+        }
+
+        public void RotateRightRequest()
+        {
+            string playerId;
+            if (!VerifyConnection(out playerId)) return;
+
+            var player = GameState.Players[playerId];
+            player.RotateRight();
+            Clients.All.playerMoved(playerId, GameState.Players[playerId]);
+        }
+
+        public void RotateLeftRequest()
+        {
+            string playerId;
+            if (!VerifyConnection(out playerId)) return;
+
+            var player = GameState.Players[playerId];
+            player.RotateLeft();
+            Clients.All.playerMoved(playerId, GameState.Players[playerId]);
         }
 
         public void UseSkillRequest(int skillId)
         {
-            var connectionId = Context.ConnectionId;
-            if (!ConnectionToId.ContainsKey(Context.ConnectionId)) return;
-
-            var playerId = ConnectionToId[connectionId];
-            if (!GameState.Players.ContainsKey(playerId)) return;
+            string playerId;
+            if (!VerifyConnection(out playerId)) return;
 
             if (GameState.Players[playerId].UseSkill(GameState, playerId, skillId))
             {
                 Clients.All.playerUsedFirstSkill(playerId, GameState);
             }
         }
+
+        private bool VerifyConnection(out string playerId)
+        {
+            var connectionId = Context.ConnectionId;
+            if (!ConnectionToId.ContainsKey(Context.ConnectionId))
+            {
+                playerId = null;
+                return false;
+            }
+            playerId = ConnectionToId[connectionId];
+            return GameState.Players.ContainsKey(playerId);
+        }
+
     }
 }
