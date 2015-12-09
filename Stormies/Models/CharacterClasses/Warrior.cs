@@ -15,10 +15,9 @@ namespace Stormies.Models.CharacterClasses
             Speed = 2.0;
         }
 
-        public override bool UseSkill(GameState gameState, string playerId, int skillId)
+        public override Skill GetSkill(int skillId)
         {
-            return _skills.Count > skillId && _skills[skillId].Use(gameState, playerId);
+            return _skills.Count <= skillId ? null : _skills[skillId];
         }
-
     }
 }

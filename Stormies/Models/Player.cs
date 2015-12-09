@@ -1,5 +1,6 @@
 ﻿using System;
 using Stormies.Models.CharacterClasses;
+using Stormies.Models.CharacterClasses.Skills;
 
 namespace Stormies.Models
 {
@@ -71,12 +72,9 @@ namespace Stormies.Models
             }
         }
 
-        public bool UseSkill(GameState gameState, string playerId, int skillId)
+        public Skill GetSkill(int skillId)
         {
-            lock (_syncLock)
-            {
-                return CharacterClass.UseSkill(gameState, playerId, skillId);
-            }
+            return CharacterClass.GetSkill(skillId);
         }
 
     }

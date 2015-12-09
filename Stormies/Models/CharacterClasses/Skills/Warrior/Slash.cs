@@ -9,6 +9,12 @@ namespace Stormies.Models.CharacterClasses.Skills.Warrior
         private const int Damage = 10;
         private const int Range = 80;
 
+        public Slash()
+        {
+            Animation = "slashAnimation";
+            Sound = "slashSound";
+        }
+
         protected override void Execute(GameState gameState, string playerId)
         {
             var user = gameState.Players[playerId];

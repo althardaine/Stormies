@@ -8,6 +8,8 @@ namespace Stormies.Models.CharacterClasses.Skills
 
         protected long Cooldown = 1000;
         protected long LastUsed;
+        public string Animation { get; protected set; }
+        public string Sound { get; protected set; }
 
         public bool Use(GameState gameState, string playerId)
         {

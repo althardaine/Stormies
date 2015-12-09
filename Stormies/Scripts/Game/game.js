@@ -2,13 +2,14 @@
 window.onload = function () {
 
     var gameHub = $.connection.gameHub;
-    var gameArea = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
+
+    var gameArea = new Phaser.Game(800, 600, Phaser.AUTO, "phaser-example", { preload: preload, create: create, update: update });
     var myId;
     var map;
     var layer;
     var players = {};
     var wKey, sKey, aKey, dKey, oneKey;
-    var swordSound;
+    var sounds = {};
 
     gameHub.client.youJoined = function (id, gameState) {
         myId = id;
@@ -53,17 +54,17 @@ window.onload = function () {
         }
     }
 
-    gameHub.client.playerUsedFirstSkill = function (playerId, gameState) {
+    gameHub.client.playerUsedSkill = function (playerId, gameState, animation, sound) {
         $("#yourHealth").empty();
         $("#yourHealth").append(htmlEncode(gameState.Players[myId].Health));
         var player = gameState.Players[playerId];
-        var skill1 = gameArea.add.sprite(player.PositionX, player.PositionY, "skill1");
-        skill1.anchor.set(0.5);
-        skill1.angle = player.Angle;
-        var skill1Animation = skill1.animations.add("slash");
-        skill1Animation.killOnComplete = true;
-        skill1.animations.play("slash", 20, false);
-        swordSound.play();
+        var skill = gameArea.add.sprite(player.PositionX, player.PositionY, animation);
+        skill.anchor.set(0.5);
+        skill.angle = player.Angle;
+        var skillAnimation = skill.animations.add("skillAnimation");
+        skillAnimation.killOnComplete = true;
+        skill.animations.play("skillAnimation", 20, false);
+        sounds[sound].play();
     }
 
 
@@ -71,9 +72,8 @@ window.onload = function () {
         gameArea.load.tilemap("stormies", "../../Map/StormiesMap.json", null, Phaser.Tilemap.TILED_JSON);
         gameArea.load.image("tiles", "../../Tiles/stormies.png");
         gameArea.load.image("player", "../../Tiles/warrior.png");
-        gameArea.load.spritesheet("skill1", "../../Tiles/warrior-skill-1.png", 160, 160, 5);
-
-        gameArea.load.audio("sword", "../../Sound/sword.mp3");
+        gameArea.load.spritesheet("slashAnimation", "../../Tiles/slash.png", 160, 160, 5);
+        gameArea.load.audio("slashSound", "../../Sound/slash.mp3");
     }
 
     function create() {
@@ -82,7 +82,7 @@ window.onload = function () {
         map = gameArea.add.tilemap("stormies");
         map.addTilesetImage("StormiesTiles", "tiles");
 
-        swordSound = gameArea.add.audio("sword");
+        sounds["slashSound"] = gameArea.add.audio("slashSound");
 
 
         layer = map.createLayer("World1");

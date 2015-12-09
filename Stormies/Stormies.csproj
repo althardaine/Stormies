@@ -278,10 +278,10 @@
     <Content Include="Scripts\_references.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sound\sword.mp3" />
+    <Content Include="Sound\slash.mp3" />
     <Content Include="Tiles\player.png" />
     <Content Include="Tiles\stormies.png" />
-    <Content Include="Tiles\warrior-skill-1.png" />
+    <Content Include="Tiles\slash.png" />
     <Content Include="Tiles\warrior.png" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

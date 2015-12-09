@@ -90,9 +90,13 @@ namespace Stormies.Hubs
             string playerId;
             if (!VerifyConnection(out playerId)) return;
 
-            if (GameState.Players[playerId].UseSkill(GameState, playerId, skillId))
+            var player = GameState.Players[playerId];
+            var skill = player.GetSkill(skillId);
+            if (skill == null) return;
+
+            if (skill.Use(GameState, playerId))
             {
-                Clients.All.playerUsedFirstSkill(playerId, GameState);
+                Clients.All.playerUsedSkill(playerId, GameState, skill.Animation, skill.Sound);
             }
         }
 
