@@ -3,71 +3,15 @@ window.onload = function () {
 
     var gameHub = $.connection.gameHub;
 
-    var gameArea = new Phaser.Game(800, 600, Phaser.AUTO, "phaser-example", { preload: preload, create: create, update: update });
+    var gameArea = new Phaser.Game(800, 600, Phaser.AUTO, "game-area", { preload: preload, create: create, update: update });
+
     var myId;
     var map;
     var layer;
     var players = {};
     var wKey, sKey, aKey, dKey, oneKey;
     var sounds = {};
-
-    gameHub.client.youJoined = function (id, gameState) {
-        myId = id;
-        $("#players").empty();
-        for (var playerId in gameState.Players) {
-            players[playerId] = gameArea.add.sprite(gameState.Players[playerId].PositionX, gameState.Players[playerId].PositionY, "player");
-            players[playerId].anchor.set(0.5);
-            players[playerId].angle = gameState.Players[playerId].Angle;
-            $("#players").append("<li>" + htmlEncode(gameState.Players[playerId].Name) + " " + htmlEncode(playerId) + "</li>");
-        };
-        $("#yourHealth").append(htmlEncode(gameState.Players[myId].Health));
-        var player = players[myId];
-        gameArea.camera.follow(player);
-    };
-
-    gameHub.client.playerJoined = function (playerId, player) {
-        $("#players").append("<li>" + htmlEncode(player.Name + " " + playerId) + "</li>");
-        if (playerId !== myId) {
-            players[playerId] = gameArea.add.sprite(player.PostionX, player.PositionY, "player");
-            players[playerId].anchor.set(0.5);
-        }
-    }
-
-    gameHub.client.playerLeft = function (gameState, id) {
-        $("#players").empty();
-        for (var playerId in gameState.Players) {
-            $("#players").append("<li>" + htmlEncode(gameState.Players[playerId].Name) + " " + htmlEncode(playerId) + "</li>");
-        };
-        players[id].destroy();
-        delete players[id];
-    };
-
-    gameHub.client.passErrorMessage = function (message) {
-        alert(message);
-        $(".popup").fadeIn();
-    };
-
-    gameHub.client.playerMoved = function (playerId, player) {
-        if (playerId in players) {
-            players[playerId].x = player.PositionX;
-            players[playerId].y = player.PositionY;
-            players[playerId].angle = player.Angle;
-        }
-    }
-
-    gameHub.client.playerUsedSkill = function (playerId, gameState, animation, sound) {
-        $("#yourHealth").empty();
-        $("#yourHealth").append(htmlEncode(gameState.Players[myId].Health));
-        var player = gameState.Players[playerId];
-        var skill = gameArea.add.sprite(player.PositionX, player.PositionY, animation);
-        skill.anchor.set(0.5);
-        skill.angle = player.Angle;
-        var skillAnimation = skill.animations.add("skillAnimation");
-        skillAnimation.killOnComplete = true;
-        skill.animations.play("skillAnimation", 20, false);
-        sounds[sound].play();
-    }
-
+    var healthPoints;
 
     function preload() {
         gameArea.load.tilemap("stormies", "../../Map/StormiesMap.json", null, Phaser.Tilemap.TILED_JSON);
@@ -111,6 +55,66 @@ window.onload = function () {
         }
     }
 
+    gameHub.client.youJoined = function (id, gameState) {
+        myId = id;
+        $("#players").empty();
+        for (var playerId in gameState.Players) {
+            players[playerId] = gameArea.add.sprite(gameState.Players[playerId].PositionX, gameState.Players[playerId].PositionY, "player");
+            players[playerId].anchor.set(0.5);
+            players[playerId].angle = gameState.Players[playerId].Angle;
+            $("#players").append("<li>" + htmlEncode(gameState.Players[playerId].Name) + " " + htmlEncode(playerId) + "</li>");
+        };
+        var player = players[myId];
+        healthPoints = gameArea.add.text(0, 0, "Health: " + gameState.Players[myId].Health);
+        healthPoints.fixedToCamera = true;
+        gameArea.camera.follow(player);
+    };
+
+    gameHub.client.playerJoined = function (playerId, player) {
+        $("#players").append("<li>" + htmlEncode(player.Name + " " + playerId) + "</li>");
+        if (playerId !== myId) {
+            players[playerId] = gameArea.add.sprite(player.PostionX, player.PositionY, "player");
+            players[playerId].anchor.set(0.5);
+        }
+    }
+
+    gameHub.client.playerLeft = function (gameState, id) {
+        $("#players").empty();
+        for (var playerId in gameState.Players) {
+            $("#players").append("<li>" + htmlEncode(gameState.Players[playerId].Name) + " " + htmlEncode(playerId) + "</li>");
+        };
+        players[id].destroy();
+        delete players[id];
+    };
+
+    gameHub.client.passErrorMessage = function (message) {
+        alert(message);
+        $(".popup").fadeIn();
+    };
+
+    gameHub.client.playerMoved = function (playerId, player) {
+        if (playerId in players) {
+            players[playerId].x = player.PositionX;
+            players[playerId].y = player.PositionY;
+            players[playerId].angle = player.Angle;
+        }
+    }
+
+    gameHub.client.playerUsedSkill = function (playerId, gameState, animation, sound) {
+        healthPoints.setText("Health: " + gameState.Players[myId].Health);
+        var player = gameState.Players[playerId];
+        var skill = gameArea.add.sprite(player.PositionX, player.PositionY, animation);
+        skill.anchor.set(0.5);
+        skill.angle = player.Angle;
+        var skillAnimation = skill.animations.add("skillAnimation");
+        skillAnimation.killOnComplete = true;
+        skill.animations.play("skillAnimation", 20, false);
+        sounds[sound].play();
+    }
+
+
+
+
 
     $.connection.hub.start().done(function () {
         $("#joinGame").click(function () {
@@ -134,7 +138,6 @@ window.onload = function () {
             if (!$(".popup:visible").length) {
                 $(".popup").fadeIn();
             }
-            e.preventDefault();
             return false;
         });
     });
