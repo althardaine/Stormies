@@ -12,7 +12,7 @@ namespace Stormies.Hubs
         private static readonly GameState GameState = new GameState();
         private static readonly Dictionary<string, string> ConnectionToId = new Dictionary<string, string>();
 
-        public void JoinRequest(string playerName)
+        public void JoinRequest(string playerName, string characterClass)
         {
             if (GameState.Players.Values.ToList().Find(p => p.Name == playerName) != null)
             {

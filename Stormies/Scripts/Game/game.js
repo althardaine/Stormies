@@ -44,6 +44,7 @@ window.onload = function () {
 
     gameHub.client.passErrorMessage = function (message) {
         alert(message);
+        $(".popup").fadeIn();
     };
 
     gameHub.client.playerMoved = function (playerId, player) {
@@ -119,11 +120,22 @@ window.onload = function () {
                 aKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.A);
                 dKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.D);
                 oneKey = gameArea.input.keyboard.addKey(Phaser.Keyboard.ONE);
-                gameHub.server.joinRequest($("#playerName").val());
+                gameHub.server.joinRequest($("#playerName").val(), $("input[type='radio'][name='characterClass']:checked").val());
+                $(this).parents(".popup").fadeOut();
             }
         });
         $(window).bind("beforeunload", function () {
             gameHub.server.leaveRequest();
+        });
+    });
+
+    $(function() {
+        $(document).ready(function() {
+            if (!$(".popup:visible").length) {
+                $(".popup").fadeIn();
+            }
+            e.preventDefault();
+            return false;
         });
     });
 }

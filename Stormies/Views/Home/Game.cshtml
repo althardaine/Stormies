@@ -11,11 +11,29 @@
 
 <body style="background: black">
 
+    <div class="popup">
+        <div class="bg"></div>
+        <div class="container">
+            <div class="content">
+                Enter your name: 
+                <br/>
+                <input type="text" id="playerName" value="Unnamed"/>
+                <br/>
+                Choose your class: 
+                <br/>
+                <form id="playerCharacterClass">
+                    <input type="radio" name="characterClass" value="warrior" checked>Warrior
+                    <br>
+                    <input type="radio" name="characterClass" value="mage">Mage
+                </form>
+                <input type="button" id="joinGame" value="Join"/>
+            </div>
+        </div>
+    </div>
+
     <div class="container" style="background: black">
-        <input type="text" id="playerName" />
-        <input type="button" id="joinGame" value="Join"/>
         <div style="color: white" id="yourHealth"></div>
-        <ul style ="color: white" id="players"></ul>
+        <ul style="color: white" id="players"></ul>
     </div>
 
     @section scripts {
