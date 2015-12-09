@@ -36,7 +36,7 @@ img {
     left:                   50%;
     margin-top:             -150px; /* minus po³owa wysokoœci */
     margin-left:            -200px; /* minus po³owa szerokoœci */
-    background:             #fff;
+    background:             #333333;
     -moz-border-radius:     10px;
     -webkit-border-radius:  10px;
     border-radius:          10px;
@@ -45,24 +45,12 @@ img {
     box-shadow:             0 0 50px #000;
 }
  
-.popup .close {
-    width:                  13px;
-    height:                 13px;
-    display:                block;
-    border:                 0;
-    cursor:                 pointer;
-    position:               absolute;
-    top:                    10px;
-    right:                  10px;
-    text-indent:            -999em;
-    overflow:               hidden;
-}
- 
 .popup .content {
     margin:                 15px 25px 15px 15px;
     width:                  360px;
     height:                 270px;
     font:                   12px 'Segoe UI', Arial, sans-serif;
-    color:                  #444;
+    background:             #333333;
+    color:                  white;
     overflow:               auto;
 }
